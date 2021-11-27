@@ -4,7 +4,7 @@ import Navbar2 from '../components/Navbar2';
 import Sidebar from '../components/Sidebar';
 import TeamsList from '../components/TeamsList';
 import { makeStyles } from '@material-ui/core/styles';
-import { messaging } from '../components/Firebase';
+// import { messaging } from '../components/Firebase';
 
 
 //CSS Styles

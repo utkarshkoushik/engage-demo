@@ -245,6 +245,7 @@ function TeamsList(props) {
 
 
     const getTeams = () => {
+        console.log(api);
         axios({
             method: 'get',
             url: api + 'teams/get_teams',

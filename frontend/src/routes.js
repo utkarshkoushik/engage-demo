@@ -8,7 +8,7 @@ import LandingPage from '../src/screen/LandingPage';
 import Chat from '../src/screen/Chat'
 import TwilioCall from '../src/components/TwilioCall';
 import Call from '../src/components/P2Pvideocall/Call';
-import { messaging } from '../src/components/Firebase';
+// import { messaging } from '../src/components/Firebase';
 import WarningModal from '../src/components/WarningModal';
 import CallModal from '../src/components/CallModal';
 import axios from 'axios';
@@ -17,6 +17,7 @@ import CallerTune from '../src/static/ringtone.mp3';
 import { withRouter } from 'react-router-dom';
 import Tasks from '../src/screen/Tasks'
 import VideoCallChat from '../src/screen/VideoCallChat';
+import AssignmentPage from './components/AssignmentPage';
 
 function MainRoute() {
     const [token, setToken] = useState();
@@ -33,21 +34,21 @@ function MainRoute() {
 
     // Setup of firebase notification
 
-    messaging.onMessage((payload) => {
-        console.log(payload);
-        if (payload.data.type == 'call') {
-            setPerson(payload.data.person);
-            setCallUUID(payload.data.uuid);
-            setOpen(true);
-            audio.play();
-            setTimeout(() => {
-                setOpen(false);
-                setPerson();
-                setCallUUID();
-                audio.pause();
-            }, 20000)
-        }
-    })
+    // messaging.onMessage((payload) => {
+    //     console.log(payload);
+    //     if (payload.data.type == 'call') {
+    //         setPerson(payload.data.person);
+    //         setCallUUID(payload.data.uuid);
+    //         setOpen(true);
+    //         audio.play();
+    //         setTimeout(() => {
+    //             setOpen(false);
+    //             setPerson();
+    //             setCallUUID();
+    //             audio.pause();
+    //         }, 20000)
+    //     }
+    // })
 
 
 
@@ -69,6 +70,7 @@ function MainRoute() {
                 <Route path="/chat/:chat_uuid" component={Chat} />
                 <Route path="/videocall/:meeting_slug" component={TwilioCall} />
                 <Route path="/meeting/conversation/:meeting_slug" component={VideoCallChat} />
+                <Route path="/assignment/:assignment_slug" component={AssignmentPage} />
                 <Route path="/call/:meeting_slug" component={Call} />
                 <Route path="*">
                     <Redirect to="/login" />

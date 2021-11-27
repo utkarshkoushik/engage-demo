@@ -41,6 +41,14 @@ class Assignment(models.Model):
     due_at = models.BigIntegerField()
     team_related = models.ForeignKey(Teams, on_delete=models.CASCADE)
     max_score = models.IntegerField()
+    assignment_slug = models.CharField(max_length=200)
+    is_assignment_auto_judge = models.BooleanField(default = False)
+    input1 = models.FileField(blank=True)
+    input2 = models.FileField(blank=True)
+    input3 = models.FileField(blank=True)
+    output1 = models.FileField(blank=True)
+    output2 = models.FileField(blank=True)
+    output3 = models.FileField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -49,5 +57,14 @@ class Submissions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     handed_in_time = models.BigIntegerField()
     points_earned = models.IntegerField(null=True, blank = True)
+    attachment = models.FileField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class Scheduler(models.Model):
+    team = models.ForeignKey(Teams, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    mode_preferred = models.IntegerField(default=0) # 0 - online, 1 - offline
+    mode_assigned = models.IntegerField(null = True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

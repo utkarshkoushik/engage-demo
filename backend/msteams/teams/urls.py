@@ -14,5 +14,12 @@ urlpatterns = [
     path('get_todos_teams',views.get_todos_teams, name='get_todos_teams'),
     path('todo_completed',views.todo_completed, name='todo_completed'),
     path('delete_todo',views.delete_todo, name='delete_todo'),
-    path('create_assignment',views.create_assignment,name='create_assignment')
+    path('create_assignment',views.create_assignment,name='create_assignment'),
+    path('judge_submission',views.judge_submission,name='judge_submission'),
+    path('get_assignments',views.get_assignments,name='get_assignments'),
+    path('get_assignment',views.get_assignment,name='get_assignment'),
+    path('upload_assignment',views.upload_assignment,name='upload_assignment'),
+    # path('get_submission',views.get_submission,name='get_submission')
+    path('get_submission',views.get_submission,name='get_submission'),
+    path('judge_testcase',views.judge_testcase,name='judge_testcase')
 ]

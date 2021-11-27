@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { api } from './Helper';
 import ReCAPTCHA from "react-google-recaptcha";
-import { getToken } from '../components/Firebase';
+// import { getToken } from '../components/Firebase';
 
 
 //CSS Styles
@@ -46,7 +46,7 @@ function LoginComp(props) {
         helperText: ""
     });
 
-    getToken(setTokenFound);
+    // getToken(setTokenFound);
 
 
     // Set token on login

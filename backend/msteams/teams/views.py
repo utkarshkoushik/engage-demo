@@ -12,8 +12,10 @@ from .models import TeamTodo, Teams,TeamParticipants, Assignment, Submissions
 import random
 import string
 import re
-
-
+import requests
+import base64
+import json
+import time
 # Create new team
 
 @api_view(["POST"])
@@ -293,7 +295,7 @@ def create_assignment(request):
     team_slug = request.data.get('team_slug')
     team = Teams.objects.get(team_slug=team_slug)
     name = request.data.get('name')
-    assignment_slug = getSlugAssignment(title)
+    assignment_slug = getSlugAssignment(name)
     description = request.data.get('description')
     attachment = request.data.get('attachment')
     closes_at = request.data.get('closes_at')
@@ -303,6 +305,7 @@ def create_assignment(request):
     assignment = Assignment()
     assignment.name = name
     assignment.description = description
+    assignment.assignment_slug = assignment_slug
     assignment.attachment = attachment
     assignment.closes_at = closes_at
     assignment.due_at = due_at
@@ -313,17 +316,154 @@ def create_assignment(request):
 
     return Response({
         'assignment_slug': assignment_slug,
+        'attachmet': assignment.attachment
+    })
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def get_assignments(request):
+    team_slug = request.data.get('team_slug')
+    team = Teams.objects.get(team_slug=team_slug)
+    assignments = Assignment.objects.filter(team_related = team)
+    
+    past_assign = []
+    active_assign = []
+
+    currTime = int(time.time()) * 1000
+    # print(currTime) 
+    for i in assignments:
+        # if i.attachment.name !='':
+        assign = {
+            'name': i.name,
+            'attachment': i.attachment.url if i.attachment else '',
+            'closes_at': i.closes_at,
+            'due_at': i.due_at,
+            'description': i.description,
+            'max_score': i.max_score,
+            'assignment_slug': i.assignment_slug
+        }
+        if i.due_at >currTime:
+            active_assign.append(assign)
+        else:
+            past_assign.append(assign)
+
+    return Response({
+        'past_assign': past_assign,
+        'active_assign': active_assign
+    })
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def get_assignment(request):
+    assignment_slug = request.data.get('assignment_slug')
+    assignment = Assignment.objects.get(assignment_slug = assignment_slug)
+    user = request.user
+    submission = Submissions.objects.filter(assignment = assignment, user = user)
+    # print(submission)
+    # return Response({
+    #     'msg': 'SUCCESS'
+    # })
+    i=assignment
+    if not submission:
+        return Response({
+            'name': i.name,
+            'attachment': i.attachment.url if i.attachment else '',
+            'closes_at': i.closes_at,
+            'due_at': i.due_at,
+            'description': i.description,
+            'max_score': i.max_score,
+            'assignment_slug': i.assignment_slug,
+            'msg': 'Not handed in'
+        })
+    submission = submission.get()
+    return Response({
+        'name': i.name,
+        'attachment': i.attachment.url if i.attachment else '',
+        'closes_at': i.closes_at,
+        'due_at': i.due_at,
+        'description': i.description,
+        'max_score': i.max_score,
+        'assignment_slug': i.assignment_slug,
+        'msg': 'Already submitted',
+        'submission_attachment': submission.attachment.url if submission.attachment else '',
+        'handed_in_time': submission.handed_in_time
     })
     
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_assignment(request):
+    assignment_slug = request.data.get('assignment_slug')
+    assignment = Assignment.objects.get(assignment_slug = assignment_slug)
+    attachment = request.data.get('attachment')
+    # print(attachment)
+    user = request.user
+    handed_in_time = int(time.time()) * 1000
+
+    submission = Submissions()
+    submission.assignment = assignment
+    submission.user = user
+    submission.handed_in_time = handed_in_time
+    submission.attachment = attachment
+    submission.save()
+
+    return Response({
+        'msg': 'Submission Successful',
+        'time': handed_in_time
+    })
+
+     
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_submission(request):
+    assignment_slug = request.data.get('assignment_slug')
+    assignment = Assignment.objects.get(assignment_slug = assignment_slug)
+    submission = Submissions.objects.filter(assignment = assignment)
+    
+    
+    all_submission = []
+    i = assignment
+
+    x = {
+        'name': i.name,
+        'attachment': i.attachment.url if i.attachment else '',
+        'closes_at': i.closes_at,
+        'due_at': i.due_at,
+        'description': i.description,
+        'max_score': i.max_score,
+        'assignment_slug': i.assignment_slug,
+    }
+
+    if not submission:
+        return Response({
+            'msg': 'No submissions made',
+            'assignment': x,
+            'submissions': []
+        })
+
+    for i in submission:
+        s = {
+            'submission_attachment': i.attachment.url if i.attachment else '',
+            'user_id': i.user.id,
+            'user_name': i.user.get_full_name(),
+            'submission_time': i.handed_in_time,
+            'points_earned': i.points_earned,
+        }
+        all_submission.append(s)
+
+    return Response({
+        'submissions': all_submission,
+        'assignment': x,
+    })
+
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_submission(request):
     assignment_slug = request.data.get('assignment_slug')
-    assignment = Assignment.objects.get(assignment_slug = assignment_alug)
-    user = request.user
+    assignment = Assignment.objects.get(assignment_slug = assignment_slug)
     handed_in_time = request.data.get('handed_in_time')
-    
     closing_time = assignment.closes_at
 
     if closing_time < handed_in_time:
@@ -341,8 +481,122 @@ def create_submission(request):
         'error': 'SUCCESS'
     })
 
+language_code = {
+    'PYTHON': 70,
+    "C++": 52,
+    "JAVA": 62,
+}
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def judge_submission(request):
+    source_code = request.data.get('source_code')
+    source_code = source_code.encode('ascii')
+    source_code = base64.b64encode(source_code)
+    source_code = source_code.decode('ascii')
+    language = request.data.get('language_id')
+    language_id = language_code[language]
+    if language_id is not None:
+        language_id = int(language_id)
+    stdin = request.data.get('stdin')
+    stdin = stdin.encode('ascii')
+    stdin = base64.b64encode(stdin)
+    stdin = stdin.decode('ascii')
+    url = "https://judge0-ce.p.rapidapi.com/submissions"
 
+    querystring = {"base64_encoded":"true","fields":"*"}
+
+    payload = {
+        'language_id': language_id,
+        'source_code': source_code,
+        'stdin': stdin
+    }
+    language_id = ""
+    headers = {
+        'content-type': "application/json",
+        'x-rapidapi-host': "judge0-ce.p.rapidapi.com",
+        'x-rapidapi-key': "ea353caa41mshc63e90bf38f8ff8p17b707jsn8d093a6be47e"
+    }
+
+    response = requests.request("POST", url, data=json.dumps(payload), headers=headers, params=querystring)
+    print(response.text)
+    url = "https://judge0-ce.p.rapidapi.com/submissions/"+response.json().get('token')
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    # print(base64.b64decode(response.json().get('stdout')))
+    # print(response.json())
+    return Response({
+        'output': response.json()
+    })
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def judge_testcase(request):
+    source_code = request.data.get('source_code')
+    source_code = source_code.encode('ascii')
+    source_code = base64.b64encode(source_code)
+    source_code = source_code.decode('ascii')
+    print(source_code)
+    language = request.data.get('language_id')
+    language_id = language_code[language]
+    if language_id is not None:
+        language_id = int(language_id)
+    expected_output = "Hello world"
+    expected_output = expected_output.encode('ascii')
+    expected_output = base64.b64encode(expected_output)
+    expected_output = expected_output.decode('ascii')
+    stdin = request.data.get('stdin')
+    stdin = stdin.encode('ascii')
+    stdin = base64.b64encode(stdin)
+    stdin = stdin.decode('ascii')
+    url = "https://judge0-ce.p.rapidapi.com/submissions/batch"
+
+    querystring = {"base64_encoded":"true","fields":"*"}
+
+    payload = { 
+        "submissions":[
+            {
+                'language_id': language_id,
+                'source_code': source_code,
+                'stdin': stdin,
+                'expected_output': expected_output,
+                'redirect_stderr_to_stdout': "true"
+            },
+            {
+                'language_id': language_id,
+                'source_code': source_code,
+                'stdin': stdin,
+                'expected_output': expected_output,
+                "redirect_stderr_to_stdout": "true"
+            },
+        ]
+        
+    }
+    language_id = ""
+    headers = {
+        'content-type': "application/json",
+        'x-rapidapi-host': "judge0-ce.p.rapidapi.com",
+        'x-rapidapi-key': "ea353caa41mshc63e90bf38f8ff8p17b707jsn8d093a6be47e"
+    }
+
+    response = requests.request("POST", url, data=json.dumps(payload), headers=headers, params=querystring)
+    print(response.json()[0])
+    tokens = ""
+    for t in response.json():
+        tokens +=t.get('token') + ","
+    url = "https://judge0-ce.p.rapidapi.com/submissions/batch"
+    querystring = {
+        "tokens": tokens,
+        'base_encoded': "true",
+        "fields":"*"
+    }
+    time.sleep(5)
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    # if response.json().submissions[0].
+    # print(base64.b64decode(response.json().get('stdout')))
+    # print(response.json())
+    return Response({
+        'output': response.json()
+    })
 
 
 # Add participant in a team

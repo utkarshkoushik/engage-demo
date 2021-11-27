@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-# python manage.py runsslserver --certificate /home/kaushiki/ms-teams-clone/ssl/mydomain.crt --key /home/kaushiki/ms-teams-clone/ssl/server.key 0.0.0.0:9000
+# python3 manage.py runsslserver --certificate /home/utkarsh/engage-demo/sslnew/engage21_me.crt --key /home/utkarsh/engage-demo/sslnew/domain.key 0.0.0.0:9000
 from pathlib import Path
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -51,9 +51,10 @@ INSTALLED_APPS = [
 
 
 ACCOUNT_SID = 'AC71fb26d592137ddcb0d55fc1c04c2d99'
-API_KEY = 'SK7fa5856d06ccc974ebed83bd84aab5a6'
-API_SECRET = 'gnLM14bTiDBhMJr3t7FTWpWV3SEdIvdN'
-ORIGINAL_AUTH_TOKEN = "6442f6f5975efd64445ca4e405c242ff"
+API_KEY = 'SK34445aa24592538f2616d33216bb05e6'
+API_SECRET = 'wlbmck1NXNQgNA1AoBFzNVCiSu2vUfpk'
+ORIGINAL_AUTH_TOKEN = "e50f0db5a55d4519c644140a988ff42d"
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

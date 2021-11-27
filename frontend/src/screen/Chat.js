@@ -13,7 +13,7 @@ import { unmountComponentAtNode, useParams, useHistory } from 'react-router-dom'
 import axios from 'axios';
 import { api } from './Helper';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { messaging } from '../components/Firebase';
+// import { messaging } from '../components/Firebase';
 import CallerTune from '../static/ringtone.mp3';
 import CallModal from '../components/CallModal';
 
@@ -156,24 +156,24 @@ function Chat() {
 
 
 
-    messaging.onMessage((payload) => {
-        console.log(payload);
-        if (payload.data.type === 'msg') {
-            fetchChatList();
-        }
-        else if (payload.data.type === 'call') {
-            setPerson(payload.data.person);
-            setCallUUID(payload.data.uuid);
-            setOpen(true);
-            audio.play();
-            setTimeout(() => {
-                setOpen(false);
-                setPerson();
-                setCallUUID();
-                audio.pause();
-            }, 20000)
-        }
-    })
+    // messaging.onMessage((payload) => {
+    //     console.log(payload);
+    //     if (payload.data.type === 'msg') {
+    //         fetchChatList();
+    //     }
+    //     else if (payload.data.type === 'call') {
+    //         setPerson(payload.data.person);
+    //         setCallUUID(payload.data.uuid);
+    //         setOpen(true);
+    //         audio.play();
+    //         setTimeout(() => {
+    //             setOpen(false);
+    //             setPerson();
+    //             setCallUUID();
+    //             audio.pause();
+    //         }, 20000)
+    //     }
+    // })
 
 
 

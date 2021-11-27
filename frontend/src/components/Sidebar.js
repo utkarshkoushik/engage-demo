@@ -7,7 +7,7 @@ import CallIcon from '@material-ui/icons/Call';
 import { useHistory, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { api } from '../screen/Helper';
-import { messaging } from './Firebase';
+// import { messaging } from './Firebase';
 import CallerTune from '../static/ringtone.mp3';
 import CallModal from './CallModal';
 
@@ -101,24 +101,24 @@ function Sidebar() {
 
 
     if (!params.chat_uuid) {
-        messaging.onMessage((payload) => {
-            console.log(payload);
-            if (payload.data.type === 'msg') {
-                fetchCount();
-            }
-            else if (payload.data.type === 'call') {
-                setPerson(payload.data.person);
-                setCallUUID(payload.data.uuid);
-                setOpen(true);
-                audio.play();
-                setTimeout(() => {
-                    setOpen(false);
-                    setPerson();
-                    setCallUUID();
-                    audio.pause();
-                }, 20000)
-            }
-        })
+        // messaging.onMessage((payload) => {
+        //     console.log(payload);
+        //     if (payload.data.type === 'msg') {
+        //         fetchCount();
+        //     }
+        //     else if (payload.data.type === 'call') {
+        //         setPerson(payload.data.person);
+        //         setCallUUID(payload.data.uuid);
+        //         setOpen(true);
+        //         audio.play();
+        //         setTimeout(() => {
+        //             setOpen(false);
+        //             setPerson();
+        //             setCallUUID();
+        //             audio.pause();
+        //         }, 20000)
+        //     }
+        // })
     }
 
 

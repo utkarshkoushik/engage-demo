@@ -28,7 +28,9 @@ import axios from 'axios';
 import TeamChat from './TeamChat';
 import OldCalls from './OldCalls';
 import Assignment from './Assignment';
-
+import Scheduler from './Scheduler';
+import Ide from './Ide';
+import StudentAssignment from './StudentAssignment';
 
 // CSS Styles
 
@@ -675,7 +677,8 @@ export default function TeamsNav(props) {
                     <Tab label="General" className={classes.tab} />
                     <Tab label="Call-Log" className={classes.tab} />
                     <Tab label="Scheduled-Calls" className={classes.tab} />
-                    <Tab label="Tasks" className={classes.tab} />
+                    {/* <Tab label="Tasks" className={classes.tab} /> */}
+                    <Tab label = "Scheduler" className={classes.tab} />
                     <Tab label="Assignment" className={classes.tab} />
                     <Tab label="Team-Participants" className={classes.tab} />
 
@@ -723,33 +726,44 @@ export default function TeamsNav(props) {
             {/* Scheduled Calls Tab */}
 
             <TabPanel value={value} index={3} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
-                {scheduledCalls.map(i => <ScheduledCalls call={i} scheduleVal={scheduleVal} setScheduleVal={setScheduleVal} />)}
+                {/* {scheduledCalls.map(i => <ScheduledCalls call={i} scheduleVal={scheduleVal} setScheduleVal={setScheduleVal} />)}
                 {scheduledCalls.length == 0 &&
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                         <img src="https://uiillustrations.net/wp-content/uploads/2020/11/Screenshot-371-1024x792.png" style={{ height: "200px", borderRadius: "5%" }} />
                         <div style={{ paddingTop: "2%", color: "gray" }}>No scheduled meeting!</div>
                     </div>
-                }
+                } */}
+                <StudentAssignment team_slug = {props.team_slug} />
             </TabPanel>
 
 
             {/* Tasks tab */}
 
 
-            <TabPanel value={value} index={4} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
+            {/* <TabPanel value={value} index={4} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
                 <div style={{ display: "flex", flexDirection: "column", width: "100%", }}>
                     <div style={{ backgroundColor: "white", borderRadius: "2%", paddingBottom: "4%" }}>
                         <TodoList allUsers={allUsers} team_slug={props.team_slug} />
+                    </div>
+                </div>
+            </TabPanel> */}
+            <TabPanel value={value} index={4} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", }}>
+                    <div style={{ backgroundColor: "white", borderRadius: "2%", paddingBottom: "4%" }}>
+                        {/* <Scheduler allUsers={allUsers} team_slug={props.team_slug} /> */}
+                        <Ide team_slug = {props.team_slug} />
                     </div>
                 </div>
             </TabPanel>
             <TabPanel value={value} index={5} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
                 <div style={{ display: "flex", flexDirection: "column", width: "100%", }}>
                     <div style={{ backgroundColor: "white", borderRadius: "2%", paddingBottom: "4%" }}>
-                        <Assignment />
+                        <Assignment team_slug = {props.team_slug} />
                     </div>
                 </div>
             </TabPanel>
+
+            
 
 
             {/* Team Participants tab */}
@@ -767,7 +781,7 @@ export default function TeamsNav(props) {
             {/* Fixed footer inside the teams screen */}
 
 
-            <div className={classes.footer}>
+            <div className={classes.footer} style={{zIndex: 10}}>
                 <Divider style={{ width: "80%" }} />
                 <div style={{}} className={classes.footer1}>
                     <Button size="small" className={classes.startMediaQuery} onClick={handleOpenStart}>Start Meeting </Button>

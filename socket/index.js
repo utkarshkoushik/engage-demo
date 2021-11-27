@@ -1,8 +1,8 @@
 const app = require("express")();
 var fs = require('fs')
 const httpsServer = require("https").createServer({
-    key: fs.readFileSync('../ssl/server.key'),
-    cert: fs.readFileSync('../ssl/mydomain.crt')
+    key: fs.readFileSync('../sslnew/domain.key'),
+    cert: fs.readFileSync('../sslnew/engage21_me.crt')
 },app);
 const options =  {
     cors: {

@@ -62,7 +62,7 @@ export default class ChatItemTeam extends Component {
         <div className="chat__item__content">
           <div className="chat__msg" style={{ fontSize: 17, fontWeight: 'bold' }} >{this.props.sender_name}</div>
           {this.props.type == 'txt' && <Linkify ><div className="chat__msg">{this.props.msg}</div></Linkify>}
-          {this.props.type == 'img' && <img onClick={this.setOpen} src={"https://www.msteams.games:9000" + this.props.img} style={{ width: 200, height: 200, objectFit: 'contain' }}></img>}
+          {this.props.type == 'img' && <img onClick={this.setOpen} src={"https://www.engage21.me:9000" + this.props.img} style={{ width: 200, height: 200, objectFit: 'contain' }}></img>}
           <div className="chat__meta">
             <span>{this.formatAMPM(new Date(this.props.sent_time))}  &nbsp; {this.state.day}</span>
             {/* <span>Seen 1.03PM</span> */}
