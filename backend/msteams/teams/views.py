@@ -29,12 +29,28 @@ def create_team(request):
     team.team_slug = getSlug(team_name)
     team.unique_code = ''.join(random.choices(string.ascii_uppercase +string.digits, k = 8))
     team.save()
-    addParticipant(team,user)   
+    # addParticipant(team,user)  
+    participant = TeamParticipants()
+    participant.user = user
+    participant.team = team
+    participant.role = 0
+    participant.save() 
     return Response({
         'team_name': team.team_name,
         'unique_code': team.unique_code
     })
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def get_user_role(request):
+    team_slug = request.data.get('team_slug')
+    team = Teams.objects.get(team_slug = team_slug)
+    user = request.user
+    participant = TeamParticipants.objects.get(user = user, team=team)
+
+    return Response({
+        'user_role': participant.role,
+    })
 
 # Join an existing team with unique code
 
@@ -301,6 +317,19 @@ def create_assignment(request):
     closes_at = request.data.get('closes_at')
     due_at = request.data.get('due_at')
     max_score = request.data.get('max_score')
+    
+    input1 = request.data.get('input1')
+    input2 = request.data.get('input2')
+    input3 = request.data.get('input3')
+    output1 = request.data.get('output1')
+    output2 = request.data.get('output2')
+    output3 = request.data.get('output3')
+
+    if input1 is not None:
+        is_assignment_auto_judge = True
+    else:
+        is_assignment_auto_judge = False
+    
 
     assignment = Assignment()
     assignment.name = name
@@ -311,12 +340,21 @@ def create_assignment(request):
     assignment.due_at = due_at
     assignment.max_score = max_score
     assignment.team_related = team
+    assignment.is_assignment_auto_judge = is_assignment_auto_judge
+
+    if is_assignment_auto_judge:
+        assignment.input1 = input1
+        assignment.input2 = input2
+        assignment.input3 = input3
+        assignment.output1 = output1
+        assignment.output2 = output2
+        assignment.output3 = output3
     
     assignment.save()
 
     return Response({
         'assignment_slug': assignment_slug,
-        'attachmet': assignment.attachment
+        # 'attachmet': assignment.attachment
     })
 
 @api_view(["POST"])
@@ -340,7 +378,8 @@ def get_assignments(request):
             'due_at': i.due_at,
             'description': i.description,
             'max_score': i.max_score,
-            'assignment_slug': i.assignment_slug
+            'assignment_slug': i.assignment_slug,
+            'is_assignment_auto_judge': i.is_assignment_auto_judge,
         }
         if i.due_at >currTime:
             active_assign.append(assign)
@@ -531,41 +570,63 @@ def judge_submission(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def judge_testcase(request):
+    assignment_slug = request.data.get('assignment_slug')
+    assignment = Assignment.objects.get(assignment_slug = assignment_slug)
+    path = "/home/utkarsh/work/engage21/engage-demo/backend/msteams/media/"
+    f1 = open(path + "input1.txt", "r")
+    f2 = open(path + "input2.txt", "r")
+    f3 = open(path + "input3.txt", "r")
+    f4 = open(path + "output1.txt", "r")
+    f5 = open(path + "output2.txt", "r")
+    f6 = open(path + "output3.txt", "r")
+    a1 = f1.read()
+    a2 = f2.read()
+    a3 = f3.read()
+    a4 = f4.read()
+    a5 = f5.read()
+    a6 = f6.read()
+    s1 = encode(a1)
+    s2 = encode(a2)
+    s3 = encode(a3)
+    s4 = encode(a4)
+    s5 = encode(a5)
+    s6 = encode(a6)
+    # return Response({
+    #     'msg': 'null'
+    # })
     source_code = request.data.get('source_code')
     source_code = source_code.encode('ascii')
     source_code = base64.b64encode(source_code)
     source_code = source_code.decode('ascii')
-    print(source_code)
     language = request.data.get('language_id')
     language_id = language_code[language]
     if language_id is not None:
         language_id = int(language_id)
-    expected_output = "Hello world"
-    expected_output = expected_output.encode('ascii')
-    expected_output = base64.b64encode(expected_output)
-    expected_output = expected_output.decode('ascii')
-    stdin = request.data.get('stdin')
-    stdin = stdin.encode('ascii')
-    stdin = base64.b64encode(stdin)
-    stdin = stdin.decode('ascii')
     url = "https://judge0-ce.p.rapidapi.com/submissions/batch"
 
     querystring = {"base64_encoded":"true","fields":"*"}
-
+    print(s1,s2,s3)
     payload = { 
         "submissions":[
             {
                 'language_id': language_id,
                 'source_code': source_code,
-                'stdin': stdin,
-                'expected_output': expected_output,
+                'stdin': s1,
+                'expected_output': s4,
                 'redirect_stderr_to_stdout': "true"
             },
             {
                 'language_id': language_id,
                 'source_code': source_code,
-                'stdin': stdin,
-                'expected_output': expected_output,
+                'stdin': s2,
+                'expected_output': s5,
+                "redirect_stderr_to_stdout": "true"
+            },
+            {
+                'language_id': language_id,
+                'source_code': source_code,
+                'stdin': s3,
+                'expected_output': s6,
                 "redirect_stderr_to_stdout": "true"
             },
         ]
@@ -598,6 +659,26 @@ def judge_testcase(request):
         'output': response.json()
     })
 
+def encode(s):
+    s = s.encode('ascii')
+    s = base64.b64encode(s)
+    s = s.decode('ascii')
+    return s
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def grade_assignment(request):
+    student_id = request.data.get('student_id')
+    assignment_slug = request.data.get('assignment_slug')
+    points = request.data.get('points')
+    assignment = Assignment.objects.get(assignment_slug = assignment_slug)
+    student = User.objects.get(id = student_id)
+    submission = Submissions.objects.get(assignment= assignment,user = student)
+    submission.points_earned = int(points)
+    submission.save()
+    return Response({
+        'msg': 'Graded Successfully'
+    })
 
 # Add participant in a team
 
@@ -605,6 +686,7 @@ def addParticipant(team,user):
     participant = TeamParticipants()
     participant.user = user
     participant.team = team
+    participant.role = 2
     participant.save()
 
 

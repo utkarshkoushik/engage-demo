@@ -12,7 +12,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-
+import Pdf from './Pdf';
 
 
 export default function Ide(props) {
@@ -47,7 +47,9 @@ int main() {
     const [isLoading,setIsLoading] = useState(false);
     const [assign, setAssign] = React.useState('');
     const [curr,setCurr] = useState([]);
-
+    const [pdfOpen, setPdfOpen] = useState(false);
+    const [link,setLink] =  useState('');
+    const [attachment,setAttachment] = useState('');
     useEffect(()=>{
         axios({
             method: 'post',
@@ -61,7 +63,8 @@ int main() {
         })
         .then(res => {
             console.log(res.data);
-            setCurr(res.data.active_assign);
+            
+            setCurr(res.data.active_assign.filter(i=>i.is_assignment_auto_judge==true));
             // setPast(res.data.past_assign);
         })
         .catch(err => {
@@ -69,8 +72,10 @@ int main() {
         })
     },[])
 
-    const handleChange = (event) => {
+    const handleChange = (event,attachment) => {
         setAssign(event.target.value);
+        var arr = curr.filter(i=>i.assignment_slug ==event.target.value)
+        setAttachment(arr[0].attachment);
     };
     useEffect(()=>{
         
@@ -143,7 +148,8 @@ int main() {
             data: {
                 source_code: source,
                 stdin: stdin,
-                language_id: language
+                language_id: language,
+                assignment_slug : assign
             },
             headers: {
                 Authorization: "Token " + token
@@ -162,6 +168,14 @@ int main() {
             })
     }
 
+    const handleOpenPdf = (link) => {
+        if (link != "") {
+            setPdfOpen(true);
+            setLink(link);
+        }
+
+    }
+
     return (
         <div>
             <p style={{fontSize: 24, fontWeight: 'bold',textAlign: 'center', marginTop: 20}}>IDE</p>
@@ -173,7 +187,7 @@ int main() {
                     id="demo-simple-select"
                     value={assign}
                     label="Select Assignment"
-                    onChange={handleChange}
+                    onChange={(e)=>{handleChange(e)}}
                 >
                     {curr.map(i=>
                         <MenuItem value={i.assignment_slug}>{i.name}</MenuItem>
@@ -181,6 +195,14 @@ int main() {
                 </Select>
             </FormControl>
             </div>
+            { assign &&            
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                    <div style={{ border: '1px solid darkgray', padding: 7, cursor: 'pointer', marginTop: 0 }} onClick={() => { handleOpenPdf(attachment) }}>
+                        <p style={{ fontSize: 16, }}>{attachment && attachment}</p>
+                        <p style={{ fontSize: 16, fontStyle: 'italic' }}>{!attachment && "None"}</p>
+                    </div>
+                </div>
+            }
             <div style={{width: '100%', marginLeft: 20,marginTop: 15,marginBottom: 0, backgroundColor: '#002B36',width: 500.219}}>
             <select style={{outline: 'none',width: 100, height: 30, color: 'white',backgroundColor: '#002B36'}} id="cars" name="cars"  value={language} onChange={handleChangeLanguage}>
                 <option value="C++">C++</option>
@@ -250,6 +272,7 @@ int main() {
                     />
                 </div>
             }
+            <Pdf link={link} open={pdfOpen} setOpen={setPdfOpen} />
         </div>
     )
 }

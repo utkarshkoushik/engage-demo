@@ -271,8 +271,9 @@ export default function TeamsNav(props) {
         general: 1,
         old_calls: 2,
         scheduled_calls: 3,
-        tasks: 4,
-        participants: 5,
+        ide: 4,
+        assignments: 5,
+        participants: 6,
     }
     const [val, setVal] = useState(1)
     const classes = useStyles();
@@ -285,6 +286,7 @@ export default function TeamsNav(props) {
     const [scheduleVal, setScheduleVal] = useState(1);
     const [scheduledCalls, setScheduledCalls] = useState([])
     const [oldCalls, setOldCalls] = useState([]);
+    const [userRole,setUserRole] = useState(0);
     const [meetName, setMeetName] = useState({
         value: "",
         error: false,
@@ -332,6 +334,26 @@ export default function TeamsNav(props) {
     }, [val])
 
 
+    useEffect(()=>{
+        const token = localStorage.getItem("token");
+        axios({
+            method: 'post',
+            data: {
+                team_slug: props.team_slug,
+            },
+            url: api + "teams/get_user_role",
+            headers: {
+                Authorization: "Token " + token
+            }
+        })
+        .then(res => {
+            setUserRole(res.data.user_role);
+            console.log(res.data);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    },[props.team_slug])
 
     // Fetch username from the backend
 
@@ -678,7 +700,7 @@ export default function TeamsNav(props) {
                     <Tab label="Call-Log" className={classes.tab} />
                     <Tab label="Scheduled-Calls" className={classes.tab} />
                     {/* <Tab label="Tasks" className={classes.tab} /> */}
-                    <Tab label = "Scheduler" className={classes.tab} />
+                    <Tab label = "IDE" className={classes.tab} />
                     <Tab label="Assignment" className={classes.tab} />
                     <Tab label="Team-Participants" className={classes.tab} />
 
@@ -726,14 +748,14 @@ export default function TeamsNav(props) {
             {/* Scheduled Calls Tab */}
 
             <TabPanel value={value} index={3} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
-                {/* {scheduledCalls.map(i => <ScheduledCalls call={i} scheduleVal={scheduleVal} setScheduleVal={setScheduleVal} />)}
+                {scheduledCalls.map(i => <ScheduledCalls call={i} scheduleVal={scheduleVal} setScheduleVal={setScheduleVal} />)}
                 {scheduledCalls.length == 0 &&
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                         <img src="https://uiillustrations.net/wp-content/uploads/2020/11/Screenshot-371-1024x792.png" style={{ height: "200px", borderRadius: "5%" }} />
                         <div style={{ paddingTop: "2%", color: "gray" }}>No scheduled meeting!</div>
                     </div>
-                } */}
-                <StudentAssignment team_slug = {props.team_slug} />
+                }
+                {/* <StudentAssignment team_slug = {props.team_slug} /> */}
             </TabPanel>
 
 
@@ -758,7 +780,8 @@ export default function TeamsNav(props) {
             <TabPanel value={value} index={5} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
                 <div style={{ display: "flex", flexDirection: "column", width: "100%", }}>
                     <div style={{ backgroundColor: "white", borderRadius: "2%", paddingBottom: "4%" }}>
-                        <Assignment team_slug = {props.team_slug} />
+                        {userRole == 0 && <Assignment team_slug = {props.team_slug} />}
+                        {userRole == 2 && <StudentAssignment team_slug = {props.team_slug} />}
                     </div>
                 </div>
             </TabPanel>

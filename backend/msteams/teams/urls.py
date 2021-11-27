@@ -21,5 +21,7 @@ urlpatterns = [
     path('upload_assignment',views.upload_assignment,name='upload_assignment'),
     # path('get_submission',views.get_submission,name='get_submission')
     path('get_submission',views.get_submission,name='get_submission'),
-    path('judge_testcase',views.judge_testcase,name='judge_testcase')
+    path('judge_testcase',views.judge_testcase,name='judge_testcase'),
+    path('get_user_role',views.get_user_role,name='get_user_role'),
+    path('grade_assignment',views.grade_assignment,name='grade_assignment')
 ]

@@ -87,7 +87,7 @@ export default function Pdf(props) {
                         cMapUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/cmaps/`,
                         cMapPacked: true,
                     }}
-                    file={"https://engage21.me:9000" + props.link}
+                    file={"https://localhost:9000" + props.link}
                     onLoadSuccess={onDocumentLoadSuccess}
                 >
                     <Page pageNumber={pageNumber} />

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-# python3 manage.py runsslserver --certificate /home/utkarsh/engage-demo/sslnew/engage21_me.crt --key /home/utkarsh/engage-demo/sslnew/domain.key 0.0.0.0:9000
+# python3 manage.py runsslserver --certificate /home/utkarsh/work/engage21/engage-demo/sslnew/engage21_me.crt --key /home/utkarsh/work/engage21/engage-demo/sslnew/domain.key 0.0.0.0:9000
 from pathlib import Path
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
