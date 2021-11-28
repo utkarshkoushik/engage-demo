@@ -60,13 +60,11 @@ Install celery
 6. This shall run the react server on https://localhost:3000.
 7. You can visit https://localhost:3000 on your browser to see the website in action. <br />
 
+## Future Scope
 
+1. This platform can be used as a plugin for Microsoft Teams. With all the existing features in teams it would be really useful to have an integrated IDE and collab editor inside teams itself. It shall really help the students and teachers in the universities.
 
-
-
-
-
-
+2. Applying Machine Learning models to further improve the auto grading of assignments can be done. This will further save a lot of time for teachers and students and will make things easier overall.
 
 
 
