@@ -32,6 +32,7 @@ import Scheduler from './Scheduler';
 import Ide from './Ide';
 import StudentAssignment from './StudentAssignment';
 import CollabEditor from './CollabEditor';
+import '../css/teamsnav.css';
 // CSS Styles
 
 
@@ -138,20 +139,24 @@ const useStyles = makeStyles((theme) => ({
     },
     tab: {
         fontWeight: "bolder",
-        paddingLeft: 0,
-        minWidth: "140px",
-        '@media(max-width: 1227px)': {
-            minWidth: "120px"
-        },
-        '@media(max-width: 1143px)': {
-            minWidth: "90px"
-        },
-        '@media(max-width: 1048px)': {
-            minWidth: "50px"
-        },
-        '@media(max-width: 987px)': {
-            minWidth: "30px"
-        }
+        // paddingLeft: 0,
+        padding: "5px 20px",
+        // marginRight: 20,
+        marginLeft: 0
+        // width: '0px !important',
+        // minWidth: "140px",
+        // '@media(max-width: 1227px)': {
+        //     minWidth: "120px"
+        // },
+        // '@media(max-width: 1143px)': {
+        //     minWidth: "90px"
+        // },
+        // '@media(max-width: 1048px)': {
+        //     minWidth: "50px"
+        // },
+        // '@media(max-width: 987px)': {
+        //     minWidth: "30px"
+        // }
     },
     meetingStart: {
         fontSize: "12px",
@@ -697,11 +702,11 @@ export default function TeamsNav(props) {
                     aria-label="scrollable auto tabs example"
                 >
                     <Tab label="Conversation" className={classes.tab} />
-                    <Tab label="General" className={classes.tab} />
-                    <Tab label="Call-Log" className={classes.tab} />
-                    <Tab label="Scheduled-Calls" className={classes.tab} />
+                    <Tab label="Video Calls" className={classes.tab} />
+                    <Tab label="Call Log" className={classes.tab} />
+                    <Tab label="Scheduled Calls" className={classes.tab} />
                     {/* <Tab label="Tasks" className={classes.tab} /> */}
-                    <Tab label = "IDE" className={classes.tab} />
+                    <Tab label = "Ide" className={classes.tab} />
                     <Tab label="Assignment" className={classes.tab} />
                     <Tab label="Team Participants" className={classes.tab} />
                     <Tab label="Collab Editor" className={classes.tab} />
@@ -816,8 +821,8 @@ export default function TeamsNav(props) {
             <div className={classes.footer} style={{zIndex: 10}}>
                 <Divider style={{ width: "80%" }} />
                 <div style={{}} className={classes.footer1}>
-                    <Button size="small" className={classes.startMediaQuery} onClick={handleOpenStart}>Start Meeting </Button>
-                    <Button size="small" style={{ width: "150px" }} className={classes.meetingStart} onClick={handleOpenSchedule}>Schedule Meeting </Button>
+                    <Button size="small" className={classes.startMediaQuery} style={{textTransform: 'none'}} onClick={handleOpenStart}>Start Video Call </Button>
+                    <Button size="small" style={{ width: "150px",textTransform: 'none' }} className={classes.meetingStart}  onClick={handleOpenSchedule}>Schedule Video Call </Button>
                 </div>
             </div>
 

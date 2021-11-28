@@ -64,7 +64,7 @@ const Room = ({ roomName, room, handleLogout }) => {
   const [imgFile, setImgFile] = useState();
   const dropRef = useRef();
   const [msg, setMsg] = useState('');
-  const [linkValue, setLinkValue] = useState("https://www.engage21.me/videocall/")
+  const [linkValue, setLinkValue] = useState("https://www.localhost/videocall/")
   const [isCopied, setCopied] = useState(false)
   const msgs = [];
   const socket = io(socketUrl);
@@ -366,7 +366,7 @@ const Room = ({ roomName, room, handleLogout }) => {
         <div key={index} style={{ margin: 0, }}>
           <p style={{ marginLeft: 0, marginTop: 20, fontWeight: 'normal' }}><b>{i.sender_name}</b> &nbsp; {formatAMPM(new Date(i.sent_time))} </p>
           {i.type1 === 'txt' && <p style={{ marginLeft: 0, marginTop: 5, maxWidth: 250 }}>{i.msg_text}</p>}
-          {i.type1 === 'img' && <img src={'https://engage21.me:9000' + i.img} style={{ width: 150, height: 150, objectFit: 'contain', border: "1px solid rgb(232, 205, 65)", borderRadius: '10px' }} />}
+          {i.type1 === 'img' && <img src={'https://localhost:9000' + i.img} style={{ width: 150, height: 150, objectFit: 'contain', border: "1px solid rgb(232, 205, 65)", borderRadius: '10px' }} />}
         </div>
       )
     }

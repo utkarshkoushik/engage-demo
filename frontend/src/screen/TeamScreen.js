@@ -326,7 +326,7 @@ function TeamScreen() {
                     <Sidebar />
                     <div className={classes.newSideDiv}>
                         <div className={classes.newSidedivData}>
-                            <Button variant="outlined" color="primary" href="/home" className={classes.button}> All teams </Button>
+                            <Button variant="outlined" color="primary" href="/home" className={classes.button}> All Classrooms </Button>
                             <div className={classes.teamNameDiv}>
                                 <p className={classes.teamPara}>{teamName.substr(0, 2).toUpperCase()}</p>
                             </div>
@@ -343,7 +343,7 @@ function TeamScreen() {
                             <div className={classes.subComponentPhone} >
                                 <div className={classes.titleTeamPhone}>{teamName}</div>
                             </div>
-                            <Button variant="outlined" color="primary" href="/home" className={classes.buttonPhone}> All teams </Button>
+                            <Button variant="outlined" color="primary" href="/home" className={classes.buttonPhone}> All Classrooms </Button>
                         </div>
                     </div>
                     <div className={classes.subComponentNav} >

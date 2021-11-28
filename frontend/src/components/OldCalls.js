@@ -102,9 +102,9 @@ function ScheduledCalls(props) {
                 </div>
                 <Divider className={classes.divider} />
             </CardContent>
-            <CardActions>
+            {/* <CardActions>
                 <Button className={classes.button} onClick={handleChat}>Conversation</Button>
-            </CardActions>
+            </CardActions> */}
         </Card>
 
     )

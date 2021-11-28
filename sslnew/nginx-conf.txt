@@ -1,12 +1,12 @@
 server {
     listen 80;
-    return 301 https://www.engage21.me;
+    return 301 https://www.localhost;
 }
 
 server {
 
 listen 443;
-    server_name engage21.me;
+    server_name localhost;
 
     ssl_certificate           /home/utkarsh/engage-demo/sslnew/engage21_me.crt;
     ssl_certificate_key       /home/utkarsh/engage-demo/sslnew/domain.key;
@@ -30,6 +30,6 @@ listen 443;
       proxy_pass          https://localhost:3000;
       proxy_read_timeout  90;
 
-      proxy_redirect      https://localhost:3000 https://engage21.me;
+      proxy_redirect      https://localhost:3000 https://localhost;
 }
 }

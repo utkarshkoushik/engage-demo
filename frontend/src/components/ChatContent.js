@@ -253,13 +253,13 @@ export default function ChatContent(props) {
     })
       .then(res => {
         console.log(res.data);
-        socket.emit('sendchat', props.thread_id, `Quick! Come join me in this call https://www.engage21.me/call/${res.data.meeting_slug}`, props.name, 'txt');
+        socket.emit('sendchat', props.thread_id, `Quick! Come join me in this call https://www.localhost/call/${res.data.meeting_slug}`, props.name, 'txt');
         const token = localStorage.getItem('token');
         axios({
           method: 'post',
           url: api + 'communication/send_message',
           data: {
-            msg_text: `Quick! Come join me in this call https://www.engage21.me/call/${res.data.meeting_slug}`,
+            msg_text: `Quick! Come join me in this call https://www.localhost/call/${res.data.meeting_slug}`,
             thread_id: props.thread_id,
           },
           headers: { Authorization: 'Token ' + token }

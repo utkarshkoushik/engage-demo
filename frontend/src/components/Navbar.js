@@ -165,7 +165,7 @@ function Navbar(props) {
       <div className="icon">
         <img className={classes.imag} src="https://img.icons8.com/fluent/48/000000/microsoft-teams-2019.png" alt="Icon" onClick={handleHeading} />
       </div>
-      <div className={classes.appName} onClick={handleHeading}>Microsoft Teams</div>
+      <div className={classes.appName} onClick={handleHeading}>Collaboration Classroom</div>
       <div className={classes.search}>
         <Paper component="form" className={classes.root}>
           <InputBase

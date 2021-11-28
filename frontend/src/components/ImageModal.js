@@ -69,7 +69,7 @@ export default function ImageModal(props) {
                 <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
                     <CloseIcon className={classes.close} onClick={props.handleClose} />
                 </div>
-                <img src={"https://www.engage21.me:9000" + props.img} className={classes.img} ></img>
+                <img src={"https://www.localhost:9000" + props.img} className={classes.img} ></img>
             </div>
         </Modal>
     )

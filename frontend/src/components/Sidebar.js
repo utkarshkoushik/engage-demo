@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
     p: {
         margin: "0",
+        textAlign: 'center'
     },
 
     sidediv: {
@@ -162,15 +163,15 @@ function Sidebar() {
         <div className={classes.sidebar}>
             <div className={classes.sidediv} onClick={handleTeams}>
                 <PeopleIcon style={{ fontSize: "1.5rem", }} />
-                <p className={classes.p}>Teams</p>
+                <p className={classes.p}>Class Rooms</p>
             </div>
-            <div className={classes.sidediv} onClick={handleChat}>
+            {/* <div className={classes.sidediv} onClick={handleChat}>
                 <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                     <ChatIcon style={{ fontSize: "1.5rem", }} />
                     {count > 0 && !params.chat_uuid && <div style={{ width: 15, height: 15, backgroundColor: 'red', borderRadius: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ margin: 0, color: 'white', fontSize: 10 }}>{count > 99 ? '99+' : count}</p></div>}
                 </div>
                 <p className={classes.p}>Chitchat</p>
-            </div>
+            </div> */}
             <CallModal open={open} handleClose={handleClose} text={`Incoming call from ${person}`} answer={`/call/${callUUID}`} />
         </div>
     )

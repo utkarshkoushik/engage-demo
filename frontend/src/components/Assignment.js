@@ -92,7 +92,7 @@ export default function Assignment(props) {
 
     const [link, setLink] = useState("");
 
-    const [input1,setInput1] = useState();
+    const [input1,setInput1] = useState('');
     const [input2,setInput2] = useState();
     const [input3,setInput3] = useState();
     const [output1,setOutput1] = useState();
@@ -247,7 +247,7 @@ export default function Assignment(props) {
 
     const assignCard = (assign) => {
         const docs = [
-            { uri: "https://www.engage21.me:9000" + assign.attachment }
+            { uri: "https://www.localhost:9000" + assign.attachment }
         ]
         return (
             <div onClick={() => handleOpenAssignment(assign)} style={{ backgroundColor: 'darkgray', marginTop: 20, padding: 20, cursor: 'pointer' }}>
@@ -505,7 +505,7 @@ export default function Assignment(props) {
                 <p style={{ fontSize: 24, fontWeight: 'bold', color: 'black', textAlign: 'center', paddingBottom: "2%" }}>Assignment</p>
                 <Button variant="contained" onClick={handleOpen} style={{ backgroundColor: "#464775", color: "white", height: "35px", width: 250, margin: 'auto' }}>Create an Assignment</Button>
                 {/* <iframe seamless
-            src="https://www.engage21.me:9000/media/xxxxx.docx">
+            src="https://www.localhost:9000/media/xxxxx.docx">
             <p>Your browser does not support iframes.</p> </iframe> */}
 
 

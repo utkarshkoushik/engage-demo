@@ -325,8 +325,8 @@ def create_assignment(request):
     output1 = request.data.get('output1')
     output2 = request.data.get('output2')
     output3 = request.data.get('output3')
-
-    if input1 is not None:
+    print(type(input1))
+    if input1:
         is_assignment_auto_judge = True
     else:
         is_assignment_auto_judge = False

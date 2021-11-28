@@ -265,7 +265,7 @@ function TeamsList(props) {
 
     return (
         <div className={classes.firstTeamList}>
-            <div className={classes.heading}>Your Teams</div>
+            <div className={classes.heading}>Your Classrooms</div>
             {myTeams.length == 0 &&
                 <div style={{ width: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
                     <img src="https://cdn.dribbble.com/users/132658/screenshots/14228126/media/1489a46d460a08048999d40ac44f3491.gif" style={{ borderRadius: "2%", }} className={classes.noTeamImage} />

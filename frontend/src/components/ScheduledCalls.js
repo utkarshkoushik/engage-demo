@@ -147,9 +147,9 @@ function ScheduledCalls(props) {
                         <Button className={classes.button} onClick={handleDelete} style={{ marginTop: props.style ? props.style.marginTop : "", marginRight: "5px" }}>
                             Delete call
                         </Button>
-                        <Button className={classes.button} style={{ width: 125, marginTop: props.style ? props.style.marginTop : "" }} onClick={handleChat} >
+                        {/* <Button className={classes.button} style={{ width: 125, marginTop: props.style ? props.style.marginTop : "" }} onClick={handleChat} >
                             Conversation
-                        </Button>
+                        </Button> */}
                     </div>
                 }
             </CardActions>

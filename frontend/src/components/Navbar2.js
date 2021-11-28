@@ -322,10 +322,10 @@ function Navbar2(props) {
   }
   return (
     <div className={classes.teams}>
-      <div className={classes.title}>Teams</div>
+      <div className={classes.title}>Classrooms</div>
       <div className={classes.options}>
         <div className={classes.join} style={{ marginRight: 20 }}>
-          <Button variant="outlined" style={{ width: 190 }} onClick={handleOpenJoin} ><PersonAddIcon style={{ paddingRight: "5px" }} /> Join a Team</Button>
+          <Button variant="outlined" style={{ width: 230 }} onClick={handleOpenJoin} ><PersonAddIcon style={{ paddingRight: "5px" }} /> Join a Classroom</Button>
 
           {/* Join a team Modal */}
 
@@ -363,7 +363,7 @@ function Navbar2(props) {
           </Modal>
         </div>
         <div className={classes.create} style={{}}>
-          <Button variant="outlined" style={{ width: 190 }} onClick={handleOpenCreate}><CreateIcon style={{ paddingRight: "5px" }} />Create a Team</Button>
+          <Button variant="outlined" style={{ width: 230 }} onClick={handleOpenCreate}><CreateIcon style={{ paddingRight: "5px" }} />Create a Classroom</Button>
 
 
           {/* Create a team Modal */}

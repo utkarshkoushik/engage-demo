@@ -5,6 +5,8 @@ import { api } from '../screen/Helper';
 import Button from '@mui/material/Button';
 import Pdf from './Pdf';
 import Editor from './Editor';
+import { TextField } from '@material-ui/core';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const style = {
     position: 'absolute',
@@ -34,6 +36,25 @@ export default function Assignment(props) {
     const handlePdfOpen=()=>{
         setPdfOpen(true);
     }
+
+    useEffect(()=>{
+        axios({
+            method: 'post',
+            url: api + 'teams/get_email',
+            headers: {
+                Authorization: "Token " + token
+            }
+        })
+        .then(res => {
+            if(res.data.email == 'rishishayan@gmail.com'){
+                setIsNonCS(true);
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    })
+
     useEffect(() => {
         axios({
             method: 'post',
@@ -68,7 +89,7 @@ export default function Assignment(props) {
 
     const assignCard=(assign)=>{
         const docs = [
-            {uri: "https://www.engage21.me:9000" + assign.attachment}
+            {uri: "https://www.localhost:9000" + assign.attachment}
         ]
         return (
             <div onClick={()=>handleOpenAssignment(assign)} style={{backgroundColor: 'darkgray', marginTop: 20, padding: 20, cursor: 'pointer'}}>
@@ -226,10 +247,56 @@ export default function Assignment(props) {
         setEditorOpen(true);
     }
     const [editorOpen, setEditorOpen] = useState(false);
+    const [isNonCS,setIsNonCS] = useState(false);
+    const [isValidateLoding,setIsValidateLoading] = useState(false);
+    const [data,setData] = useState(false);
+
+    const handleValidate=()=>{
+        setIsValidateLoading(true);
+        setTimeout(function () {
+            setIsValidateLoading(false);
+            setData(true);
+        }, 1500)
+    }
+
 
     const assignTab=()=>{
         return (
-            <div style={{display: 'flex',}}>
+            <div>
+                {isNonCS && 
+                    <div style={{display: 'flex', }}>
+                        <div style={{flex: 1}}>
+                            <p style={{textAlign: 'left', fontSize: 18, fontWeight: 'bold'}}>{currAssignData && currAssignData?.name}</p>
+                            <p style={{fontSize: 14, color: 'darkgray',}}>Due at - {currAssignData && (dueDate)}</p>
+                            <p style={{textAlign: 'center', fontSize: 24, fontWeight: 'bold'}}>Answer the following questions</p>
+                            <div style={{marginTop: 20}}>
+                                <p style={{marginTop: 10, fontSize: 18}}>
+                                    Q1. State the first law of thermodynamics.
+                                </p>
+                                <TextField variant="outlined" multiline={true} rows = {5} label="Type the answer" style={{width: "100%", marginTop: 20, }}>
+
+                                </TextField>
+                                <p style={{marginTop: 30, fontSize: 18}}>
+                                    Q2. State the second law of thermodynamics.
+                                </p>
+                                <TextField variant="outlined" multiline={true} rows = {5} label="Type the answer" style={{width: "100%", marginTop: 20, }}>
+
+                                </TextField>
+                                <button onClick={handleValidate} style={{marginTop: 30, width: 150, height: 35, outline: 'none', border:'none', color: 'white', backgroundColor: 'purple', cursor: "pointer"}}>{isValidateLoding?"Loading ..." :"Validate"}</button>
+                               {data && <div style={{marginTop: 30,}}>
+                                    <p style={{marginBottom: 15, color: 'green'}}>90% match</p>
+                                    <LinearProgress variant="determinate" value={90} color={"success"} />
+                                </div>}
+                            </div>
+                            </div>
+                            <div onClick={()=>{setIsAssignActive(false)}} style={{cursor: 'pointer'}}>
+                                <p style={{fontSize: 20}}>X</p>
+                            </div>
+                    </div>
+                }
+            {!isNonCS && 
+                <React.Fragment>
+                <div style={{display: 'flex',}}>
                 <Editor open={editorOpen} setOpen={setEditorOpen} code = {code} assignment_slug = {currAssign} language={lang} />
                 <div style={{flex: 1}}>
                     <p style={{textAlign: 'left', fontSize: 18, fontWeight: 'bold'}}>{currAssignData && currAssignData?.name}</p>
@@ -305,6 +372,9 @@ export default function Assignment(props) {
                     <p style={{fontSize: 20}}>X</p>
                 </div>
             </div>
+            </React.Fragment>
+        }
+        </div>
         )
     }
     
