@@ -16,6 +16,7 @@ import requests
 import base64
 import json
 import time
+import math
 # Create new team
 
 @api_view(["POST"])
@@ -366,11 +367,15 @@ def get_assignments(request):
     
     past_assign = []
     active_assign = []
-
+    
     currTime = int(time.time()) * 1000
     # print(currTime) 
     for i in assignments:
         # if i.attachment.name !='':
+        submission = Submissions.objects.filter(assignment = i, user = request.user)
+        sub = False
+        if submission:
+            sub = True
         assign = {
             'name': i.name,
             'attachment': i.attachment.url if i.attachment else '',
@@ -380,6 +385,7 @@ def get_assignments(request):
             'max_score': i.max_score,
             'assignment_slug': i.assignment_slug,
             'is_assignment_auto_judge': i.is_assignment_auto_judge,
+            'submission': sub
         }
         if i.due_at >currTime:
             active_assign.append(assign)
@@ -412,6 +418,7 @@ def get_assignment(request):
             'description': i.description,
             'max_score': i.max_score,
             'assignment_slug': i.assignment_slug,
+            'is_assignment_auto_judge': i.is_assignment_auto_judge,
             'msg': 'Not handed in'
         })
     submission = submission.get()
@@ -425,7 +432,11 @@ def get_assignment(request):
         'assignment_slug': i.assignment_slug,
         'msg': 'Already submitted',
         'submission_attachment': submission.attachment.url if submission.attachment else '',
-        'handed_in_time': submission.handed_in_time
+        'is_assignment_auto_judge': i.is_assignment_auto_judge,
+        'code': submission.code,
+        'language': submission.language,
+        'handed_in_time': submission.handed_in_time,
+        'points_earned': submission.points_earned,
     })
     
 
@@ -487,6 +498,8 @@ def get_submission(request):
             'user_name': i.user.get_full_name(),
             'submission_time': i.handed_in_time,
             'points_earned': i.points_earned,
+            'code': i.code,
+            'language': i.language,
         }
         all_submission.append(s)
 
@@ -524,6 +537,9 @@ language_code = {
     'PYTHON': 70,
     "C++": 52,
     "JAVA": 62,
+    70: 70,
+    52: 52,
+    62: 62
 }
 
 @api_view(["POST"])
@@ -554,7 +570,7 @@ def judge_submission(request):
     headers = {
         'content-type': "application/json",
         'x-rapidapi-host': "judge0-ce.p.rapidapi.com",
-        'x-rapidapi-key': "ea353caa41mshc63e90bf38f8ff8p17b707jsn8d093a6be47e"
+        'x-rapidapi-key': "e3e0e6d476msh6e8edf9a08423c9p17c9ccjsnbc4defd064b5"
     }
 
     response = requests.request("POST", url, data=json.dumps(payload), headers=headers, params=querystring)
@@ -569,31 +585,36 @@ def judge_submission(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+def get_email(request):
+    user = request.user
+    return Response({
+        'email': user.email
+    })
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
 def judge_testcase(request):
     assignment_slug = request.data.get('assignment_slug')
     assignment = Assignment.objects.get(assignment_slug = assignment_slug)
     path = "/home/utkarsh/work/engage21/engage-demo/backend/msteams/media/"
-    f1 = open(path + "input1.txt", "r")
-    f2 = open(path + "input2.txt", "r")
-    f3 = open(path + "input3.txt", "r")
-    f4 = open(path + "output1.txt", "r")
-    f5 = open(path + "output2.txt", "r")
-    f6 = open(path + "output3.txt", "r")
-    a1 = f1.read()
-    a2 = f2.read()
-    a3 = f3.read()
-    a4 = f4.read()
-    a5 = f5.read()
-    a6 = f6.read()
+    f1 = assignment.input1.open(mode='rb').read()
+    f2 = assignment.input2.open(mode='rb').read()
+    f3 = assignment.input3.open(mode='rb').read()
+    f4 = assignment.output1.open(mode='rb').read()
+    f5 = assignment.output2.open(mode='rb').read()
+    f6 = assignment.output3.open(mode='rb').read()
+    a1 = f1.decode("utf-8") 
+    a2 = f2.decode("utf-8") 
+    a3 = f3.decode("utf-8") 
+    a4 = f4.decode("utf-8") 
+    a5 = f5.decode("utf-8") 
+    a6 = f6.decode("utf-8") 
     s1 = encode(a1)
     s2 = encode(a2)
     s3 = encode(a3)
     s4 = encode(a4)
     s5 = encode(a5)
     s6 = encode(a6)
-    # return Response({
-    #     'msg': 'null'
-    # })
     source_code = request.data.get('source_code')
     source_code = source_code.encode('ascii')
     source_code = base64.b64encode(source_code)
@@ -636,7 +657,7 @@ def judge_testcase(request):
     headers = {
         'content-type': "application/json",
         'x-rapidapi-host': "judge0-ce.p.rapidapi.com",
-        'x-rapidapi-key': "ea353caa41mshc63e90bf38f8ff8p17b707jsn8d093a6be47e"
+        'x-rapidapi-key': "e3e0e6d476msh6e8edf9a08423c9p17c9ccjsnbc4defd064b5"
     }
 
     response = requests.request("POST", url, data=json.dumps(payload), headers=headers, params=querystring)
@@ -655,6 +676,33 @@ def judge_testcase(request):
     # if response.json().submissions[0].
     # print(base64.b64decode(response.json().get('stdout')))
     # print(response.json())
+    # print(response.json()['submissions'][0]['status']['description'])
+    final_submission = request.data.get('final_submission')
+    if final_submission is not None:
+        test1 = response.json()['submissions'][0]['status']['description']
+        test2 = response.json()['submissions'][1]['status']['description']
+        test3 = response.json()['submissions'][2]['status']['description']
+        # print(response.json()['submissions'][2]['source_code'])
+        max_score = assignment.max_score
+        total_score = 0
+        if test1 == 'Accepted':
+            total_score +=max_score/3
+        if test2 == 'Accepted':
+            total_score +=max_score/3
+        if test3 == 'Accepted':
+            total_score +=max_score/3
+        submission = Submissions.objects.filter(user = request.user, assignment = assignment)
+        if not submission:
+            submission = Submissions()
+            submission.assignment = assignment
+            submission.user = request.user
+            submission.handed_in_time = time.time() * 1000
+            submission.points_earned = math.ceil(total_score)
+            submission.code = response.json()['submissions'][2]['source_code']
+            submission.langauge = response.json()['submissions'][2]['language_id']
+            submission.save()
+
+
     return Response({
         'output': response.json()
     })

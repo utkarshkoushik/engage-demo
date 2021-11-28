@@ -4,7 +4,7 @@ import { api } from '../screen/Helper';
 // import { Document, Page } from 'react-pdf';
 import Button from '@mui/material/Button';
 import Pdf from './Pdf';
-
+import Editor from './Editor';
 
 const style = {
     position: 'absolute',
@@ -129,37 +129,45 @@ export default function Assignment(props) {
             </React.Fragment>
         )
     }
+    const [code,setCode] = useState();
+    const [lang,setLang] = useState();
+    const getAssignment=()=>{
+        axios({
+            method: 'post',
+            url: api + 'teams/get_assignment',
+            data: {
+                assignment_slug: currAssign,
+            },
+            headers: {
+                Authorization: "Token " + token
+            }
+        })
+        .then(res => {
+            console.log(res.data);
+            setCurrAssignData(res.data);
+            const date = new Date(res.data.due_at);
+            const dateStr = date.getHours() + ":" +  date.getMinutes() + " " + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
+            setDueDate(dateStr);
+            if(res.data.msg == "Already submitted"){
+                setAreadyUploaded(true);
+                console.log(res.data.submission_attachment)
+                setSubmissionLink(res.data.submission_attachment);
+                setCode(res.data.code);
+                setLang(res.data.language);
+            }
+            else{
+                setAreadyUploaded(false);                    
+            }
+            
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
 
     useEffect(()=>{
         if(currAssign!=""){
-            axios({
-                method: 'post',
-                url: api + 'teams/get_assignment',
-                data: {
-                    assignment_slug: currAssign,
-                },
-                headers: {
-                    Authorization: "Token " + token
-                }
-            })
-            .then(res => {
-                console.log(res.data);
-                setCurrAssignData(res.data);
-                const date = new Date(res.data.due_at);
-                const dateStr = date.getHours() + ":" +  date.getMinutes() + " " + date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
-                setDueDate(dateStr);
-                if(res.data.msg == "Already submitted"){
-                    setAreadyUploaded(true);
-                    setSubmissionLink(res.data.attachment);
-                }
-                else{
-                    setAreadyUploaded(false);                    
-                }
-                
-            })
-            .catch(err => {
-                console.log(err);
-            })
+            getAssignment();
         }
     },[currAssign])
 
@@ -196,6 +204,7 @@ export default function Assignment(props) {
         })
         .then(res => {
             console.log(res.data);
+            getAssignment();
         })
         .catch(err => {
             console.log(err);
@@ -203,14 +212,25 @@ export default function Assignment(props) {
     }
 
     const handleOpenPdf=(link)=>{
-        setLink(link);
-        setPdfOpen(true);
+        if(link){
+            setLink(link);
+            setPdfOpen(true);
+        }
+        
     }
+    const handleOpenEditor=(code,language)=>{
+        console.log(code);
+        setCode(code);
+        console.log({language});
+        setLang(language);
+        setEditorOpen(true);
+    }
+    const [editorOpen, setEditorOpen] = useState(false);
 
     const assignTab=()=>{
         return (
             <div style={{display: 'flex',}}>
-                
+                <Editor open={editorOpen} setOpen={setEditorOpen} code = {code} assignment_slug = {currAssign} language={lang} />
                 <div style={{flex: 1}}>
                     <p style={{textAlign: 'left', fontSize: 18, fontWeight: 'bold'}}>{currAssignData && currAssignData?.name}</p>
                     <p style={{fontSize: 14, color: 'darkgray',}}>Due at - {currAssignData && (dueDate)}</p>
@@ -226,24 +246,30 @@ export default function Assignment(props) {
 
                 {!alreadyUploaded &&
                     <React.Fragment>
-                    {currAssignData && new Date().getTime()< currAssignData.due_at &&
-                    <p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Upload Work </p>}
+                    
+                    {currAssignData && new Date().getTime()< currAssignData.due_at &&                        
+                        <p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Upload Work </p>
+                    }
                     {currAssignData && new Date().getTime()> currAssignData.due_at &&
-                    <p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Your Work </p>}
-                    {currAssignData && new Date().getTime()< currAssignData.due_at &&
-                        <div style={{marginBottom: 20}}>
-                        <div style={{marginTop: 10}}>
-                            <div style={{display:"flex", alignItems: 'center'}}>
-                                <input type="file" onChange={onFileChange} />
-                                {/* <Button onClick={onFileUpload} variant="contained"  style={{backgroundColor:"#464775", color:"white", height:"35px" }}>
-                                    Upload!
-                                </Button> */}
-                            </div>
-                            {fileData()}
-                            <Button onClick={uploadSubmission} style={{marginTop: 20, backgroundColor: '#464775', width: 140, height: 42, }} variant="contained">Upload</Button>
+                        <div style={{display: 'flex'}}>
+                            <div style={{flex: 1}}><p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Your Work </p></div>
+                            <div style={{}}><p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Points Earned: {currAssignData?.points_earned} </p></div>
                         </div>
-
-                    </div>}
+                    }
+                    {currAssignData && new Date().getTime()< currAssignData.due_at && !currAssignData.is_assignment_auto_judge &&
+                        <div style={{marginBottom: 20}}>
+                            <div style={{marginTop: 10}}>
+                                <div style={{display:"flex", alignItems: 'center'}}>
+                                    <input type="file" onChange={onFileChange} />
+                                </div>
+                                {fileData()}
+                                <Button onClick={uploadSubmission} style={{marginTop: 20, backgroundColor: '#464775', width: 140, height: 42, }} variant="contained">Upload</Button>
+                            </div>
+                        </div>
+                    }
+                    {currAssignData && new Date().getTime()< currAssignData.due_at && currAssignData.is_assignment_auto_judge &&
+                        <p style={{fontSize: 20, fontWeight: 'bold'}}>Go to editor to make submission</p>
+                    }
                     {currAssignData && new Date().getTime()>= currAssignData.due_at && 
                         <p style={{fontSize: 20,}}>Not Uploaded</p>
                     }
@@ -251,13 +277,27 @@ export default function Assignment(props) {
                 }
                 {alreadyUploaded &&
                     <React.Fragment>
-                    <p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Your Work</p>
-                    <div style={{marginBottom: 20}}>
-                        <div onClick={()=>{handleOpenPdf(submissionLink)}} style={{border: '1px solid darkgray', padding: 7, cursor: 'pointer'}}>
-                            <p style={{fontSize: 16,}}>{submissionLink}</p>
-                            {/* <p style={{fontSize: 16,fontStyle: 'italic'}}>{submissionLink}</p> */}
+                        <div style={{display: 'flex'}}>
+                            <div style={{flex: 1}} ><p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Your Work</p></div>
+                            <div style={{}}><p style={{fontSize: 14, marginTop: 32, color: 'darkgray'}}>Points Earned: {currAssignData?.points_earned} </p></div>
                         </div>
-                    </div>
+                    {!code && 
+                        <div style={{marginBottom: 20}}>
+                            <div onClick={()=>{handleOpenPdf(submissionLink)}} style={{border: '1px solid darkgray', padding: 7, cursor: 'pointer'}}>
+                                <p style={{fontSize: 16,}}>{submissionLink?submissionLink:'None'}</p>
+                                {/* <p style={{fontSize: 16,fontStyle: 'italic'}}>{submissionLink}</p> */}
+                            </div>
+                        </div>
+                    }
+                    {code && 
+                        <div style={{marginBottom: 20}}>
+                            <div onClick={()=>{handleOpenEditor(code,lang)}} style={{border: '1px solid darkgray', padding: 7, cursor: 'pointer'}}>
+                                <p style={{fontSize: 16,}}>Open In Editor</p>
+                                {/* <p style={{fontSize: 16,fontStyle: 'italic'}}>{submissionLink}</p> */}
+                            </div>
+                        </div>
+                    }
+
                     </React.Fragment>
                 }
                 </div>

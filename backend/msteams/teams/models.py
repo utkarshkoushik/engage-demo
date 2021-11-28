@@ -42,6 +42,7 @@ class Assignment(models.Model):
     team_related = models.ForeignKey(Teams, on_delete=models.CASCADE)
     max_score = models.IntegerField()
     assignment_slug = models.CharField(max_length=200)
+    is_group_assignment = models.BooleanField(default = False)
     is_assignment_auto_judge = models.BooleanField(default = False)
     input1 = models.FileField(blank=True)
     input2 = models.FileField(blank=True)
@@ -58,6 +59,8 @@ class Submissions(models.Model):
     handed_in_time = models.BigIntegerField()
     points_earned = models.IntegerField(null=True, blank = True)
     attachment = models.FileField(blank=True)
+    code = models.TextField(null=True, blank=True)
+    language = models.IntegerField(blank=True,default=52)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

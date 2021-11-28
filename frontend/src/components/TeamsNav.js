@@ -31,7 +31,7 @@ import Assignment from './Assignment';
 import Scheduler from './Scheduler';
 import Ide from './Ide';
 import StudentAssignment from './StudentAssignment';
-
+import CollabEditor from './CollabEditor';
 // CSS Styles
 
 
@@ -274,6 +274,7 @@ export default function TeamsNav(props) {
         ide: 4,
         assignments: 5,
         participants: 6,
+        collab_editor: 7
     }
     const [val, setVal] = useState(1)
     const classes = useStyles();
@@ -702,7 +703,8 @@ export default function TeamsNav(props) {
                     {/* <Tab label="Tasks" className={classes.tab} /> */}
                     <Tab label = "IDE" className={classes.tab} />
                     <Tab label="Assignment" className={classes.tab} />
-                    <Tab label="Team-Participants" className={classes.tab} />
+                    <Tab label="Team Participants" className={classes.tab} />
+                    <Tab label="Collab Editor" className={classes.tab} />
 
                 </Tabs>
             </AppBar>
@@ -772,7 +774,6 @@ export default function TeamsNav(props) {
             <TabPanel value={value} index={4} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
                 <div style={{ display: "flex", flexDirection: "column", width: "100%", }}>
                     <div style={{ backgroundColor: "white", borderRadius: "2%", paddingBottom: "4%" }}>
-                        {/* <Scheduler allUsers={allUsers} team_slug={props.team_slug} /> */}
                         <Ide team_slug = {props.team_slug} />
                     </div>
                 </div>
@@ -788,6 +789,8 @@ export default function TeamsNav(props) {
 
             
 
+            
+
 
             {/* Team Participants tab */}
 
@@ -795,7 +798,13 @@ export default function TeamsNav(props) {
             <TabPanel value={value} index={6} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
                 <Invite team_slug={props.team_slug} allUsers={allUsers} reloadValue={reloadValue} isAdmin={props.isAdmin} uniqueCode={props.uniqueCode} />
             </TabPanel>
-            
+            <TabPanel value={value} index={7} className={classes.tabPanel} style={{ paddingTop: "91px" }}>
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", }}>
+                    <div style={{ backgroundColor: "white", borderRadius: "2%", paddingBottom: "4%" }}>
+                        <CollabEditor team_slug = {props.team_slug} />
+                    </div>
+                </div>
+            </TabPanel>
 
 
 

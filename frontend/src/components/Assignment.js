@@ -12,6 +12,7 @@ import UploadFile from './UploadFile';
 import axios from 'axios';
 import { api } from '../screen/Helper';
 import Pdf from './Pdf';
+import Editor from './Editor';
 // import { Document, Page } from 'react-pdf';
 
 
@@ -40,7 +41,7 @@ export default function Assignment(props) {
     const [currAssign, setCurrAssign] = useState("");
     const [currAssignData, setCurrAssignData] = useState();
     const [dueDate, setDueDate] = useState();
-    useEffect(() => {
+    const getAssignments=()=>{
         axios({
             method: 'post',
             url: api + 'teams/get_assignments',
@@ -59,6 +60,9 @@ export default function Assignment(props) {
             .catch(err => {
                 console.log(err);
             })
+    }
+    useEffect(() => {
+        getAssignments();
     }, [])
     const [heading, setHeading] = useState({
         value: "",
@@ -94,7 +98,8 @@ export default function Assignment(props) {
     const [output1,setOutput1] = useState();
     const [output2,setOutput2] = useState();
     const [output3,setOutput3] = useState();
-    
+    const [lang,setLang] = useState();
+    const [code,setCode] = useState('');
     const handleHeading = (e) => {
         setHeading({
             value: e.target.value,
@@ -187,6 +192,8 @@ export default function Assignment(props) {
             })
                 .then(res => {
                     console.log(res.data);
+                    setOpen(false);
+                    getAssignments();
                 })
                 .catch(err => {
                     console.log(err);
@@ -225,7 +232,6 @@ export default function Assignment(props) {
                 const date = new Date(res.data.assignment.due_at);
                 const dateStr = date.getHours() + ":" + date.getMinutes() + " " + date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
                 setDueDate(dateStr);
-
             })
             .catch(err => {
                 console.log(err);
@@ -366,9 +372,19 @@ export default function Assignment(props) {
         }
     }
 
+    const handleOpenEditor=(code,language)=>{
+        console.log(code);
+        setCode(code);
+        console.log({language});
+        setLang(language);
+        setEditorOpen(true);
+    }
+    const [editorOpen, setEditorOpen] = useState(false);
+
     const submission = () => {
         return (
             <div>
+                <Editor open={editorOpen} setOpen={setEditorOpen} code = {code} assignment_slug = {currAssign} language={lang} />
                 {currAssignData && currAssignData.submissions.map(i =>
                     <div style={{ backgroundColor: 'white', padding: 10, border: '1px solid grey', marginBottom: '10px' }}>
                         <div style={{ display: 'flex' }} >
@@ -378,15 +394,23 @@ export default function Assignment(props) {
                                 </p>
                             </div>
                             <p style={{ marginRight: 10, color: 'darkgrey', fontSize: 14 }}>Max Points: {currAssignData.assignment.max_score}</p>
-                            <p style={{ marginRight: 10, color: 'darkgrey', fontSize: 14 }}>Points Given: {i.points_earned ? i.points_earned : 'Not Graded'}</p>
+                            <p style={{ marginRight: 10, color: 'darkgrey', fontSize: 14 }}>Points Given: {(i.points_earned || i.points_earned == 0) ? i.points_earned : 'Not Graded'}</p>
                         </div>
                         <p style={{ marginTop: 10, marginBottom: 5, color: 'darkgrey', fontSize: 14 }}>
                             Attachment
                         </p>
-                        <div style={{ border: '1px solid darkgray', padding: 7, cursor: 'pointer', marginTop: 0 }} onClick={() => { handleOpenPdf(i.submission_attachment) }}>
-                            <p style={{ fontSize: 16, }}>{i.submission_attachment && i.submission_attachment}</p>
-                            <p style={{ fontSize: 16, fontStyle: 'italic' }}>{!i.submission_attachment && "None"}</p>
-                        </div>
+                        {!i.code && 
+                            <div style={{ border: '1px solid darkgray', padding: 7, cursor: 'pointer', marginTop: 0 }} onClick={() => { handleOpenPdf(i.submission_attachment) }}>
+                                <p style={{ fontSize: 16, }}>{i.submission_attachment && i.submission_attachment}</p>
+                                <p style={{ fontSize: 16, fontStyle: 'italic' }}>{!i.submission_attachment && "None"}</p>
+                            </div>
+                        }
+                        {i.code &&
+                            <div style={{ border: '1px solid darkgray', padding: 7, cursor: 'pointer', marginTop: 0 }} onClick={() => { handleOpenEditor(i.code, i.language) }}>
+                                <p style={{ fontSize: 16, }}>Open Code in Editor</p>
+                                {/* <p style={{ fontSize: 16, fontStyle: 'italic' }}>{!i.submission_attachment && "None"}</p> */}
+                            </div>
+                        }
 
                         <div>
                             <button onClick={() => { setOpenGrade(true) }} style={{ outline: "none", border: 'none', width: 142, height: 35, backgroundColor: 'green', color: 'white', fontSize: '16px', marginTop: 15, cursor: 'pointer' }}>GRADE</button>

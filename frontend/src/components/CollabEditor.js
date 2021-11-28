@@ -6,16 +6,18 @@ import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-solarized_dark";
 import { TextField } from '@material-ui/core';
 import axios from 'axios';
-import { api } from '../screen/Helper';
+import { api, socketUrl } from '../screen/Helper';
 import "../css/ide.css";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Pdf from './Pdf';
+import { io } from "socket.io-client";
 
 
 export default function Ide(props) {
+    const socket = io(socketUrl);
     const defaultCode={
         'JAVA': `import java.util.*;
 import java.lang.*;
@@ -40,6 +42,25 @@ int main() {
         `,
         "PYTHON":`#Start coding`
     }
+    function makeid(length) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < length; i++ ) {
+          result += characters.charAt(Math.floor(Math.random() * 
+     charactersLength));
+       }
+       return result;
+    }
+    var thread_id;
+    if(!window.location.href.split("#")[2]){
+        thread_id = makeid(10);
+    }
+    else{
+        thread_id = window.location.href.split("#")[2];
+    }
+    thread_id = "hl2gLOnK2q"
+    
     const token = localStorage.getItem("token");
     const [stdin,setStdin] = useState("");
     const [stdout,setStdout]= useState("");
@@ -51,8 +72,10 @@ int main() {
     const [link,setLink] =  useState('');
     const [attachment,setAttachment] = useState('');
     const [submissionResult,setSubmissionResult] = useState(false);
-    const [sub,setSub] = useState(false);
-    const getAssignmentA=()=>{
+
+    const [user,setUser] = useState('');
+    const [reqUser,setReqUser] = useState('');
+    useEffect(()=>{
         axios({
             method: 'post',
             url: api + 'teams/get_assignments',
@@ -72,19 +95,65 @@ int main() {
         .catch(err => {
             console.log(err);
         })
-    }
-    useEffect(()=>{
-        getAssignmentA();
     },[])
 
+    useEffect(()=>{
+        axios({
+            method: 'post',
+            url: api + 'teams/get_email',
+            headers: {
+                Authorization: "Token " + token
+            }
+        })
+        .then(res => {
+            setUser(res.data.email);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    },[])
+
+    
+    
     const handleChange = (event,attachment) => {
         setAssign(event.target.value);
-        var arr = curr.filter(i=>i.assignment_slug ==event.target.value)
+        
+        var arr = curr.filter(i=>i.assignment_slug ==event.target.value);
+        socket.emit('update_assignment',thread_id,event.target.value,arr[0].attachment);
         setAttachment(arr[0].attachment);
-        setSub(arr[0].submission)
     };
     useEffect(()=>{
         
+        socket.on('connect', function () {
+            socket.emit('uuid', thread_id);
+        });
+        socket.on('updateRunCode', function (data) {
+            // console.log(data, name);
+            setStdout(atob(data));
+            setIsLoading(false);
+        })
+        socket.on('updateSubmitCode', function (data) {
+            // console.log(data, name);
+            setResult(data);
+            setIsLoading(false);
+            setSubmissionResult(true);
+            
+        })
+        socket.on('updateUpdateCode', function (data,user) {
+            // console.log(data, name);
+            setSource(data);
+        })
+        socket.on('updateLoading', function () {
+            setIsLoading(true);
+        })
+        socket.on('updateAssignment', function (data,attachment) {
+            setAssign(data);
+            setAttachment(attachment)
+        })
+        
+        return () => {
+            socket.disconnect();
+        }
     },[])
     const [source,setSource] = useState(`#include <iostream>
 using namespace std;
@@ -99,7 +168,9 @@ int main() {
     }
 
     const handleRun=()=>{
+        socket.emit('loading',thread_id);
         if(isLoading){
+            
             return;
         }
         setIsLoading(true);
@@ -122,6 +193,7 @@ int main() {
                 console.log(res.data);
                 if(res.data.output.stdout){
                     setStdout(atob(res.data.output.stdout));
+                    socket.emit('run_code',thread_id,res.data.output.stdout);
                 }
                 
             })
@@ -132,11 +204,10 @@ int main() {
 
     function onChange(newValue) {
         // console.log("change", newValue);
+        socket.emit('update_code',thread_id, newValue,user);
         setSource(newValue);
     }
-    useEffect(()=>{
-        console.log(sub)
-    },[curr])
+
 
     const handleChangeLanguage=(e)=>{
         // console.log(e);
@@ -145,7 +216,12 @@ int main() {
     }
     const [result,setResult] = useState([]);
     const handleSubmit=()=>{
+        socket.emit('loading',thread_id);
+        if(user!=reqUser){
+            socket.emit('submit_code',thread_id,user);
+        }
         if(isLoading){
+            
             return;
         }
         setIsLoading(true);
@@ -168,6 +244,7 @@ int main() {
                 setSubmissionResult(true);
                 setIsLoading(false);
                 console.log(res.data);
+                socket.emit('submit_code',thread_id,[res.data.output.submissions[0].status.description,res.data.output.submissions[1].status.description,res.data.output.submissions[2].status.description]);
                 console.log(res.data.output.submissions[0].status.description);
                 setSubmissionResult(true);
                 setResult([res.data.output.submissions[0].status.description,res.data.output.submissions[1].status.description,res.data.output.submissions[2].status.description]);
@@ -190,8 +267,7 @@ int main() {
     }
 
     const handleUploadAssignment=()=>{
-
-        if(isLoading || sub){
+        if(isLoading){
             return;
         }
         setIsLoading(true);
@@ -221,8 +297,6 @@ int main() {
             if(res.data.output.stdout){
                 setStdout(atob(res.data.output.stdout));
             }
-            getAssignmentA();
-            setSub(true);
             
         })
         .catch(err => {
@@ -316,9 +390,8 @@ int main() {
                         <button onClick={handleSubmit} style={{border:"none", outline: 'none', width: 150, height: 34, backgroundColor: "purple", color: 'white', margin: 20, cursor: 'pointer' }}>
                             {!isLoading?  "Submit": "Loading..."}
                         </button>
-                        <button onClick={handleUploadAssignment} style={{border:"none", outline: 'none', width: 150, height: 34, backgroundColor: sub?'darkgrey':'purple', color: 'white', margin: 20, cursor: sub?'default':'pointer',  }}>
-                            {!sub && ((!isLoading) ?  "Upload Assignment": "Loading...")}
-                            {sub &&  "Already Submitted"}
+                        <button onClick={handleUploadAssignment} style={{border:"none", outline: 'none', width: 150, height: 34, backgroundColor: "purple", color: 'white', margin: 20, cursor: 'pointer' }}>
+                            {!isLoading?  "Upload Assignment": "Loading..."}
                         </button>  
                     </React.Fragment>
                 }

@@ -45,8 +45,27 @@ io.on("connection", socket => {
       socket.room = room;
       console.log(socket.room,"seen");
       io.sockets.in(socket.room).emit('updateSeen', name);
-    }
-    );
+    });
+    socket.on('run_code',function(room,data){
+      socket.room = room;
+      io.sockets.in(socket.room).emit('updateRunCode',data);
+    });
+    socket.on('submit_code',function(room,data){
+      socket.room = room;
+      io.sockets.in(socket.room).emit('updateSubmitCode',data);
+    });
+    socket.on('update_code',function(room,data,name){
+      socket.room = room;
+      io.sockets.in(socket.room).emit('updateUpdateCode', data,name);
+    });
+    socket.on('loading',function(room){
+      socket.room = room;
+      io.sockets.in(socket.room).emit('updateLoading');
+    });
+    socket.on('update_assignment',function(room,data,attachment){
+      socket.room = room;
+      io.sockets.in(socket.room).emit('updateAssignment',data,attachment);
+    });
   
 });
 
