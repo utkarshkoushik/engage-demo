@@ -40,7 +40,7 @@ Install celery
 6. Note steps 5 and 6 needs to be run only once while initial setup
 7. Run -> ```python3 manage.py runsslserver --certificate {PWD}/ms-teams-clone/ssl/mydomain.crt --key {PWD}/ms-teams-clone/ssl/server.key 0.0.0.0:9000```
 8. Where {PWD} shall be replace with present working directory
-9. Example -> ```python3 manage.py runsslserver --certificate /home/kaushiki/ms-teams-clone/ssl/mydomain.crt --key /home/kaushiki/ms-teams-clone/ssl/server.key 9000```
+9. Example -> ```python3 manage.py runsslserver --certificate /home/utkarsh/work/engage21/engage-demo/sslnew/engage21_me.crt --key /home/utkarsh/work/engage21/engage-demo/sslnew/domain.key 0.0.0.0:9000```
 
 ### Setup and run celery - 
 1. Navigate to /backend/msteams
