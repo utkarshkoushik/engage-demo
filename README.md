@@ -38,7 +38,7 @@ Install celery
 4. Run -> python3 manage.py makemigrations
 5. Run -> python3 manage.py migrate
 6. Note steps 5 and 6 needs to be run only once while initial setup
-7. Run -> ```python3 manage.py runsslserver --certificate {PWD}/ms-teams-clone/ssl/mydomain.crt --key {PWD}/ms-teams-clone/ssl/server.key 0.0.0.0:9000```
+7. Run -> ```python3 manage.py runsslserver --certificate {PWD}/ms-teams-clone/ssl/engage21_me.crt --key {PWD}/ms-teams-clone/ssl/domain.key 0.0.0.0:9000```
 8. Where {PWD} shall be replace with present working directory
 9. Example -> ```python3 manage.py runsslserver --certificate /home/utkarsh/work/engage21/engage-demo/sslnew/engage21_me.crt --key /home/utkarsh/work/engage21/engage-demo/sslnew/domain.key 0.0.0.0:9000```
 
@@ -59,7 +59,6 @@ Install celery
 5. For example -> ```REACT_APP_DJANGO_URL=https://localhost:9000/ REACT_APP_SOCKET_URL=https://localhost:5000 npm start```
 6. This shall run the react server on https://localhost:3000.
 7. You can visit https://localhost:3000 on your browser to see the website in action. <br />
-***Note - please allow the website to show notifications which is by default off in most of the broswers.***
 
 
 
