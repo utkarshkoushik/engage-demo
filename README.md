@@ -3,7 +3,6 @@ Created by - Utkarsh Koushik
 
 Collaboration classroom is a project built for Microsoft Engage'21 program. This is a platform for university students and professors to make their task easier for online education. For teachers it contains auto grading of assignments. There is an integrated IDE which can be used to run and submit code for coding assignments inside the website itself. The teacher can view and grade the assignments. It also has an collab editor where in multiple students can work on the same ide and the code gets updated real time. It also has a video calling and chat feature to further enhance collaboration among students and teachers.
 
-For working prototype of the product, please visit https://engage21.me/
 
 ## Features
 1. **Signup and Login feature** - Provides basic authentication
